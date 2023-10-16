@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
     //required: [true, "Please Enter your First name"],
-    default:""
+    default: ""
   },
   // middleName: {
   //   type: String,
@@ -18,62 +18,57 @@ const userSchema = new mongoose.Schema({
   // },
   employeeId: {
     type: String,
-    default:""
+    default: ""
   },
   email: {
     type: String,
-    required: [true, "Please Enter your E-mail!"],
     unique: true,
     lowercase: true,
-    validate: [validator.isEmail, "Please provide your valid E-mail!"],
-    default:""
+    default: ""
   },
   phone: {
     type: String,
-    default:""
+    default: ""
   },
   password: {
     type: String,
-    required: [true, "Please Provide a Password!"],
-    minlength: 8,
     select: false,
-    default:""
   },
   confirmpassword: {
     type: String,
-    default:""
+    default: ""
   },
   dateOfBirth: {
     type: String,
-    default:""
+    default: ""
   },
   highestEducationQualification: {
     type: String,
-    default:""
+    default: ""
   },
   specialisation: {
     type: String,
-    default:""
+    default: ""
   },
   currentAddress: {
     type: String,
-    default:""
+    default: ""
   },
   permanentAddress: {
     type: String,
-    default:""
+    default: ""
   },
   bloodGroup: {
     type: String,
-    default:""
+    default: ""
   },
   emergencyContactNumber: {
     type: String,
-    default:""
+    default: ""
   },
   otp: {
     type: Number,
-    default:123456
+    default: 123456
   },
   role: {
     type: String,
@@ -82,23 +77,23 @@ const userSchema = new mongoose.Schema({
   },
   google_id: {
     type: String,
-    default:""
+    default: ""
   },
   location: {
     type: {
-   type: String,
-   // enum: ["Point"],
-   default: "Point",
- },
- coordinates: {
-   type: [Number],
-   default: [0, 0],
- },
-},
+      type: String,
+      // enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number],
+      default: [0, 0],
+    },
+  },
 
   ////////////////////////////////////////////////
 
- 
+
 });
 
 

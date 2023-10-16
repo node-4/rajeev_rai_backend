@@ -4,6 +4,7 @@ const userController = require("../controllers/user/userCreate");
 const { verifyToken } = require("../middleware/middleware")
 
 Router.route("/login").post(userController.login);
+Router.route("/loginWithPhone").post(userController.loginWithPhone);
 Router.route("/verifyotp").post(userController.verifyotp);
 Router.route("/signup").post(userController.signup);
 Router.route("/getall").get(userController.getAll);

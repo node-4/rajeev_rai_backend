@@ -67,7 +67,27 @@ module.exports.verifyOTP = async (req, res) => {
     return res.status(400).json({ msg: error.message, name: error.name });
   }
 };
-
+exports.loginWithPhone = async (req, res) => {
+  try {
+    const phone = await User.findOne({ phone: req.body.phone });
+    if (phone) {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      let update = await User.findByIdAndUpdate({ _id: phone._id }, { $set: { otp: otp } }, { new: true });
+      return res.status(200).send({ msg: "true", update });
+    } else {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      req.body.otp = otp;
+      const newUser = await User.create(req.body);
+      return res.status(200).send({ msg: "true", newUser });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      errorName: error.name,
+      message: error.message,
+    });
+  }
+};
 exports.signup = async (req, res) => {
   try {
     const email = await User.findOne({ email: req.body.email });
@@ -194,7 +214,6 @@ exports.verifyotp = async (req, res) => {
       return res.status(400).json({ msg: "invalid otp" });
     } else {
       // const data = { _id: verifyOtp._id, phone: verifyOtp.phone };
-
       // const token = jwt.sign(
       //   {id: verifyOtp._id.toString() },
       //    process.env.KEY,
@@ -204,9 +223,7 @@ exports.verifyotp = async (req, res) => {
       // );
       // console.log(token);
       // res.setHeader("x-api-key", /* "Bearer "*/ +token);
-      return res
-        .status(200)
-        .json({ msg: "signIn successfull", data: verifyOtp /* Token: token*/ });
+      return res.status(200).json({ msg: "signIn successfull", data: verifyOtp /* Token: token*/ });
     }
   } catch (err) {
     console.log(err);
