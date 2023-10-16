@@ -223,7 +223,9 @@ exports.verifyotp = async (req, res) => {
       // );
       // console.log(token);
       // res.setHeader("x-api-key", /* "Bearer "*/ +token);
-      return res.status(200).json({ msg: "signIn successfull", data: verifyOtp /* Token: token*/ });
+      createSendToken(verifyOtp, 200, res);
+
+      // return res.status(200).json({ msg: "signIn successfull", data: verifyOtp /* Token: token*/ });
     }
   } catch (err) {
     console.log(err);
