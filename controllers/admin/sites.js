@@ -109,7 +109,7 @@ module.exports.deleteSite = async (req, res) => {
     if (site == null) {
       return res.status(404).json({ message: "Cannot find site" });
     }
-    await site.remove();
+    const deletedNotification = await Site.findByIdAndDelete(site._id);
     res.json({ message: "Site deleted successfully" });
   } catch (err) {
     return res.status(400).json({ message: err.message });
