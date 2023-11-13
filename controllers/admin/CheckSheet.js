@@ -38,7 +38,6 @@ exports.createCheckSheet = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 // READ all check sheets
 exports.getAllCheckSheets = async (req, res) => {
   try {
@@ -48,7 +47,6 @@ exports.getAllCheckSheets = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 // READ a single check sheet by ID
 exports.getCheckSheetById = async (req, res) => {
   try {
@@ -63,9 +61,6 @@ exports.getCheckSheetById = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
-
 exports.addQuestionInID = async (req, res) => {
   try {
     upload.single("file")(req, res, async (err) => {
@@ -103,9 +98,6 @@ exports.addQuestionInID = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
-
 exports.updateCheckSheet = async (req, res) => {
   try {
     upload.single("file")(req, res, async (err) => {
@@ -144,9 +136,6 @@ exports.updateCheckSheet = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-
-
-
 // Update the addQuestionForInspect array with answerDropdown data
 // router.put("/questions/:questionId", async (req, res) => {
 //   try {
@@ -208,8 +197,6 @@ exports.updateCheckSheet = async (req, res) => {
 //     return res.status(500).json({ message: "Server error" });
 //   }
 // };
-
-
 exports.CheckAnswer = async (req, res) => {
   try {
     const checkSheet = await CheckSheet.findOne({ _id: req.params.id });
@@ -237,7 +224,6 @@ exports.CheckAnswer = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
 // Function to shuffle an array in-place
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -245,7 +231,6 @@ function shuffleArray(array) {
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
-
 // DELETE a check sheet by ID
 exports.deleteCheckSheet = async (req, res) => {
   try {
@@ -258,7 +243,6 @@ exports.deleteCheckSheet = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 // READ a single check sheet by ID
 exports.getCheckSheetBySiteId = async (req, res) => {
   try {
@@ -271,7 +255,6 @@ exports.getCheckSheetBySiteId = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 exports.getCheckSheetBySiteIdandchecksheetid = async (req, res) => {
   try {
     const checkSheet = await CheckSheet.find({
@@ -286,7 +269,6 @@ exports.getCheckSheetBySiteIdandchecksheetid = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 // UPDATE a check sheet by ID
 exports.updatefields = async (req, res) => {
   try {
@@ -321,7 +303,6 @@ exports.updatefields = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 // UPDATE a check sheet by ID
 exports.populatesiteid = async (req, res) => {
   try {
@@ -337,9 +318,6 @@ exports.populatesiteid = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
-
 exports.updateCheckSheetSubmitted = async (req, res) => {
   try {
     const checkSheetId = req.params.id;
@@ -360,8 +338,6 @@ exports.updateCheckSheetSubmitted = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-
 exports.getSubmittedCheckSheets = async (req, res) => {
   try {
     const submittedCheckSheets = await CheckSheet.find({ submitted: "true" });
@@ -372,4 +348,3 @@ exports.getSubmittedCheckSheets = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
