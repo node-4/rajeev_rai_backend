@@ -28,18 +28,17 @@ const checkSheetSchema = mongoose.Schema({
         type: String,
         default: "select",
       },
-      photo:{
-        type:String,
-        default:""
+      photo: {
+        type: String,
+        default: ""
       },
-      remarks:{
-        type:String,
-        default:""
+      remarks: {
+        type: String,
+        default: ""
       },
       answerDropdown: [],
     },
   ],
-  
   uploadDocument: {
     type: String,
     default: "",
@@ -48,13 +47,9 @@ const checkSheetSchema = mongoose.Schema({
     type: objectid,
     ref: "site",
   },
-  siteName: {
-    type: String,
-    default: "",
-  },
-  QA_CA_ID: {
-    type: String,
-    default: "",
+  clientId: {
+    type: objectid,
+    ref: "User"
   },
   client: {
     type: String,
@@ -72,28 +67,13 @@ const checkSheetSchema = mongoose.Schema({
     type: String,
     default: "",
   },
-  // location:{
-  //   type:String,
-  //   default:""
-  // },
   location: {
-    type: {
-      type: String,
-      // enum: ["Point"],
-      default: "Point",
-    },
-    coordinates: {
-      type: [Number],
-      default: [0, 0],
-    },
+    type: String,
+    default: ""
   },
-  inspectorid: {
-    type: objectid,
-    ref: "User",
-  },
-  submitted:{
-    type:String,
-    default:"false"
+  submitted: {
+    type: String,
+    default: "false"
   }
 });
 

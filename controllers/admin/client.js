@@ -1,30 +1,25 @@
-const clientModel = require('../../model/client'); // Import the clientModel module
-
-// Controller function to create a new client
+const clientModel = require('../../model/userCreate'); // Import the clientModel module
 exports.createClient = async (req, res) => {
   try {
-    // Create a new client object from the request body
-    const newClient = new clientModel(req.body);
-
-    // Save the new client object to the database
-    const savedClient = await newClient.save();
-
-    // Send the saved client as the response
-    res.status(201).json(savedClient);
+    const user = await clientModel.findOne({ email, role: "client" });
+    if (user) {
+      return res.status(409).json({ status: 409, message: "client already Exit" });
+    } else {
+      req.body.role = "client";
+      const newClient = new clientModel(req.body);
+      const savedClient = await newClient.save();
+      res.status(201).json(savedClient);
+    }
   } catch (err) {
     // Handle any errors that occur during the database operation
     console.error('Error creating client:', err);
     return res.status(500).json({ error: 'Failed to create client' });
   }
 };
-
-// Controller function to get a client by ID
 exports.getClientById = async (req, res) => {
   try {
     // Fetch the client by ID from the database
     const client = await clientModel.findById(req.params.id);
-
-    // Check if the client was found
     if (!client) {
       return res.status(404).json({ error: 'Client not found' });
     }
@@ -37,14 +32,10 @@ exports.getClientById = async (req, res) => {
     return res.status(500).json({ error: 'Failed to get client' });
   }
 };
-
-
-
-// Controller function to get a client by ID
 exports.getAllClient = async (req, res) => {
   try {
     // Fetch the client by ID from the database
-    const client = await clientModel.find();
+    const client = await clientModel.find({ role: "client" });
 
     // Check if the client was found
     if (!client) {
@@ -59,10 +50,6 @@ exports.getAllClient = async (req, res) => {
     res.status(500).json({ error: 'Failed to get client' });
   }
 };
-
-
-
-// Controller function to update a client by ID
 exports.updateClientById = async (req, res) => {
   try {
     // Fetch the client by ID from the database and update its properties
@@ -81,8 +68,6 @@ exports.updateClientById = async (req, res) => {
     return res.status(500).json({ error: 'Failed to update client' });
   }
 };
-
-// Controller function to delete a client by ID
 exports.deleteClientById = async (req, res) => {
   try {
     // Fetch the client by ID from the database and delete it

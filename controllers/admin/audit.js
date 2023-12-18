@@ -1,7 +1,5 @@
 const Audit = require("../../model/audit");
-
 const moment = require("moment");
-
 const siteModel = require("../../model/sites"); // Import the siteModel
 
 // Controller function to populate siteId in audit collection
@@ -35,7 +33,6 @@ const siteModel = require("../../model/sites"); // Import the siteModel
 //   }
 // };
 
-
 exports.populateSiteId = async (req, res) => {
   try {
     // Fetch audit document by auditId
@@ -55,10 +52,6 @@ exports.populateSiteId = async (req, res) => {
     return { success: false, message: 'Failed to populate SiteId in Audit', error: err.message };
   }
 };
-
-
-
-
 exports.getAllAudits = async (req, res) => {
   try {
     const audits = await Audit.find().populate("siteId checksheetid")
@@ -67,7 +60,6 @@ exports.getAllAudits = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-
 exports.getAuditById = async (req, res) => {
   try {
     const audit = await Audit.findById(req.params.id).populate("siteId checksheetid")
@@ -76,11 +68,9 @@ exports.getAuditById = async (req, res) => {
     res.status(404).json({ success: false, error: "Audit not found" });
   }
 };
-
 exports.createAudit = async (req, res) => {
   try {
     const parsedDate = moment(req.body.date, "YYYY-MM-DD").format();
-    //const parsedDate =  new Date(req.body.date, "YYYY-MM-DD").format() + 1
     const data = {
       siteId: req.body.siteId,
       siteName: req.body.siteName,
@@ -90,8 +80,6 @@ exports.createAudit = async (req, res) => {
       location: req.body.location,
       date: parsedDate,
       address: req.body.address,
-      // auditRequirements: req.body.auditRequirements,
-      // uploadFileFromYourDevice: req.body.uploadFileFromYourDevice,
       checksheetid: req.body.checksheetid,
     };
 
@@ -101,7 +89,6 @@ exports.createAudit = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
-
 exports.updateAudit = async (req, res) => {
   try {
     const audit = await Audit.findByIdAndUpdate(req.params.id, req.body, {
@@ -113,7 +100,6 @@ exports.updateAudit = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
-
 exports.deleteAudit = async (req, res) => {
   try {
     const audit = await Audit.findByIdAndDelete(req.params.id);
@@ -122,7 +108,6 @@ exports.deleteAudit = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
-
 // Get the number of days left until an inspection starts
 exports.inspections = async (req, res) => {
   // router.get('/inspections/:id/days-left', async (req, res) => {
@@ -144,7 +129,6 @@ exports.inspections = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.audits = async (req, res) => {
   try {
     // const audits = await Audit.find();
@@ -176,7 +160,6 @@ exports.audits = async (req, res) => {
     return res.status(500).send("Server Error");
   }
 };
-
 exports.updateStatus = async (req, res) => {
   try {
     const audit = await Audit.findByIdAndUpdate(req.params.id, req.body, {
@@ -188,8 +171,6 @@ exports.updateStatus = async (req, res) => {
     res.status(400).json({ success: false, error: error.message });
   }
 };
-
-
 exports.getAuditStatus = async (req, res) => {
   try {
     const audit = await Audit.find({ Status: req.params.status }).populate("siteId checksheetid")

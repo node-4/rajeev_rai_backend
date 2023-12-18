@@ -11,40 +11,14 @@ const signToken = (id, role) => {
     expiresIn: JWT_EXPIRES_IN,
   });
 };
-
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id, user.role);
-  console.log(token);
-
-  //   const cookieOptions = {
-  //     expires: new Date(
-  //       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-  //     ),
-  //     httpOnly: true,
-  //   };
-  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-
-  res.setHeader("x-api-key", /* "Bearer "*/ +token);
-
-  // Remove the password from the output
-  user.password = undefined;
-
-  console.log("hi");
-  //console.log(user.otp);
-  return res.status(statusCode).json({
-    status: "success",
-    token,
-    user,
-    otp: user.otp,
-  });
+  return res.status(statusCode).json({ status: "success", token, user, otp: user.otp, });
 };
-
 module.exports.verifyOTP = async (req, res) => {
   try {
     const { otp } = req.body;
-    const verifyOtp = await User.findOne({
-      otp: otp,
-    });
+    const verifyOtp = await User.findOne({ otp: otp, });
     if (!verifyOtp || verifyOtp.length == 0) {
       return res.status(400).json({ msg: "invalid otp" });
     } else {
@@ -69,7 +43,7 @@ module.exports.verifyOTP = async (req, res) => {
 };
 exports.loginWithPhone = async (req, res) => {
   try {
-    const phone = await User.findOne({ phone: req.body.phone });
+    const phone = await User.findOne({ phone: req.body.phone, role: "auditor" });
     if (phone) {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       let update = await User.findByIdAndUpdate({ _id: phone._id }, { $set: { otp: otp } }, { new: true });
@@ -77,6 +51,8 @@ exports.loginWithPhone = async (req, res) => {
     } else {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       req.body.otp = otp;
+      req.body.role = "auditor";
+      req.body.auditorStatus = "Pending";
       const newUser = await User.create(req.body);
       return res.status(200).send({ msg: "true", newUser });
     }
@@ -90,7 +66,7 @@ exports.loginWithPhone = async (req, res) => {
 };
 exports.signup = async (req, res) => {
   try {
-    const email = await User.findOne({ email: req.body.email });
+    const email = await User.findOne({ email: req.body.email, role: "auditor" });
     if (email) return res.status(200).send({ msg: "email already present " });
     const salt = await bcrypt.genSalt(10);
     if (req.body.password == (null || undefined)) {
@@ -101,11 +77,10 @@ exports.signup = async (req, res) => {
     if (req.body.confirmpassword == (null || undefined)) {
       res.status(201).send({ msg: "Please provide confirmpassword " });
     } else {
-      req.body.confirmpassword = await bcrypt.hash(
-        req.body.confirmpassword,
-        salt
-      );
+      req.body.confirmpassword = await bcrypt.hash(req.body.confirmpassword, salt);
     }
+    req.body.role = "auditor";
+    req.body.auditorStatus = "Pending";
     const newUser = await User.create(req.body);
     return res.status(200).send({ msg: "true", newUser });
     //   await new Email(newUser, url).sendWelcome();
@@ -119,42 +94,36 @@ exports.signup = async (req, res) => {
     });
   }
 };
-
 module.exports.getAll = async (req, res) => {
   try {
-    const sites = await User.find();
-    res.json(sites);
+    const sites = await User.find({ role: "auditor" });
+    return res.json(sites);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
-
 module.exports.getUserById = async (req, res) => {
   try {
     const site = await User.findById(req.params.id);
     if (site == null) {
       return res.status(404).json({ message: "Cannot find user" });
     }
-    res.json({ msg: site });
+    return res.json({ msg: site });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
-
 exports.updateUser = async (req, res) => {
   try {
-    const site = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const site = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, });
     if (!site) {
       return res.status(404).json({ message: "user not found" });
     }
-    res.json(site);
+    return res.json(site);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
-
 exports.login = async (req, res, next) => {
   const { input, password } = req.body;
   if (!input || !password) {
@@ -164,7 +133,7 @@ exports.login = async (req, res, next) => {
   if (validator.isEmail(input)) {
     var email = input;
 
-    const user = await User.findOne({ email: email }).select("+password");
+    const user = await User.findOne({ email: email, role: "auditor" }).select("+password");
     console.log(user.password);
 
     if (!user /*|| !(await user.correctPassword(password, user.password))*/) {
@@ -201,15 +170,10 @@ exports.login = async (req, res, next) => {
     createSendToken(user, 200, res);
   }
 };
-
 exports.verifyotp = async (req, res) => {
   try {
     const { /*phone,*/ otp } = req.body;
-
-    const verifyOtp = await User.findOne({
-      otp: otp,
-    });
-
+    const verifyOtp = await User.findOne({ otp: otp, });
     if (!verifyOtp || verifyOtp.length == 0) {
       return res.status(400).json({ msg: "invalid otp" });
     } else {
@@ -232,7 +196,6 @@ exports.verifyotp = async (req, res) => {
     return res.status(400).send({ message: err.message });
   }
 };
-
 exports.forgetPassword = async (req, res, next) => {
   const { email } = req.body;
 
@@ -280,12 +243,11 @@ exports.forgetPassword = async (req, res, next) => {
       }
     });
 
-    res.json({ msg: admin });
+    return res.json({ msg: admin });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
-
 exports.updateLocationofUser = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
@@ -318,5 +280,31 @@ exports.updateLocationofUser = async (req, res) => {
     res
       .status(500)
       .send({ status: 500, message: "Server error" + error.message });
+  }
+};
+exports.updateAuditorKyc = async (req, res) => {
+  try {
+    const site = await User.findById(req.params.id);
+    if (!site) {
+      return res.status(404).json({ message: "Cannot find User" });
+    } else {
+      const site1 = await User.findByIdAndUpdate({ _id: site._id }, { $set: { auditorStatus: req.body.auditorStatus } }, { new: true });
+      return res.json(site1);
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+exports.updateUserType = async (req, res) => {
+  try {
+    const site = await User.findById(req.params.id);
+    if (!site) {
+      return res.status(404).json({ message: "Cannot find User" });
+    } else {
+      const site1 = await User.findByIdAndUpdate({ _id: site._id }, { $set: { role: req.body.role } }, { new: true });
+      return res.json(site1);
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
   }
 };

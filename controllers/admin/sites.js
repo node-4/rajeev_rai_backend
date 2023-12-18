@@ -1,27 +1,66 @@
 const Site = require("../../model/sites");
-const clientModel = require("../../model/client");
 const CheckSheet = require("../../model/CheckSheet");
+const clientModel = require('../../model/userCreate'); // Import the clientModel module
 const XLSX = require("xlsx");
 const ExcelJS = require("exceljs");
 const fs = require("fs");
 exports.createSite = async (req, res) => {
   try {
-    const { QA_CA_ID, Client_email, siteId, siteName, circle_state, location, site_address, dueDate, dateAuditScheduled, dateAllocated, InspectorName, dateActualAudit, reviewerName, dateReviewed, clientRepName, DateClient, uploadFileFromDevice, } = req.body; // Destructure request body
-    const newSite = new Site({ QA_CA_ID, Client_email, siteId, siteName, circle_state, location, site_address, dueDate, dateAuditScheduled, dateAllocated, InspectorName, dateActualAudit, reviewerName, dateReviewed, clientRepName, DateClient, uploadFileFromDevice, });
-    const savedSite = await newSite.save(); // Save the new site to siteModel
-    // console.log(savedSite. _id)
-    // const checkSheet = await CheckSheet.create({siteId:savedSite. _id, siteName:savedSite.siteName})
-    return res.status(201).json({ site: savedSite }); // Send the saved site as JSON response with 201 status code
+    const { QA_CA_ID, clientId, siteId, siteName, circle_state, location, site_address, uploadFileFromDevice, DateClient, } = req.body;
+    const client = await clientModel.findOne({ _id: clientId, role: "client" });
+    if (!client) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+    let clientRepName = client.representativeName;
+    let Client_email = client.email;
+    const newSite = new Site({ QA_CA_ID, Client_email, clientRepName, clientId, siteId, siteName, circle_state, location, site_address, DateClient, uploadFileFromDevice, });
+    const savedSite = await newSite.save();
+    return res.status(201).json({ site: savedSite });
   } catch (err) {
     return res.status(500).json({ error: "Failed to create site" }); // Handle any error that occurs
   }
 };
 module.exports.getAllSites = async (req, res) => {
   try {
-    const sites = await Site.find();
-    res.json({ msg: sites });
+    let query1 = {};
+    if (req.query.clientId) {
+      query1 = { clientId: req.query.clientId };
+    }
+    if (req.query.auditorId) {
+      query1 = { auditorId: req.query.auditorId };
+    }
+    if (req.query.reviewerId) {
+      query1 = { reviewerId: req.query.reviewerId };
+    }
+    const sites = await Site.find(query1);
+    if (sites.length == 0) {
+      return res.status(404).json({ status: 404, message: "No data found" });
+    }
+    return res.json({ status: 200, message: "Data found successfully.", msg: sites });
   } catch (err) {
     return res.status(500).json({ message: err.message });
+  }
+};
+exports.assignSite = async (req, res) => {
+  try {
+    const site = await Site.findById(req.params.id);
+    if (!site) {
+      return res.status(404).json({ message: "Cannot find site" });
+    } else {
+      if (req.body.assignedType == 'auditor') {
+        req.body.auditorId = req.body.assignedId;
+        req.body.dateAuditScheduled = new Date();
+      }
+      if (req.body.assignedType == 'reviewer') {
+        req.body.reviewerId = req.body.assignedId;
+        req.body.dateAllocated = new Date();
+      }
+      const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: req.body }, { new: true });
+      return res.json(site1);
+    }
+
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
   }
 };
 module.exports.getSite = async (req, res) => {
@@ -163,5 +202,48 @@ exports.downloadSite = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+};
+exports.importCheckSheet = async (req, res) => {
+  try {
+    console.log(req.file);
+    const file = req.file;
+    const path = file.path;
+    const workbook = XLSX.readFile(file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const orders = XLSX.utils.sheet_to_json(sheet);
+    for (const orderData of orders) {
+      const addQuestions = orderData["addQuestionForInspect"];
+      const questionArray = [];
+      for (const questionData of addQuestions) {
+        const questionObj = {
+          question: questionData["question"],
+          type: questionData["type"],
+        };
+        questionArray.push(questionObj);
+      }
+      const orderObj = {
+        nameOfCheckSheet: orderData["nameOfCheckSheet"],
+        revisionNumber: orderData["revisionNumber"],
+        uploadDocument: orderData["uploadDocument"],
+        siteId: orderData["siteId"],
+        inspectorid: orderData["inspectorid"],
+        addQuestionForInspect: questionArray,
+      };
+
+      const order = await CheckSheet.create(orderObj);
+    }
+
+    fs.unlink(path, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error deleting file" });
+      }
+    });
+
+    res.status(200).json({ message: "Data uploaded successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: 0, message: error.message });
   }
 };

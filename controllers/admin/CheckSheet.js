@@ -1,8 +1,6 @@
 const CheckSheet = require("../../model/CheckSheet");
-const Inspector = require("../../model/inspector");
 const User = require("../../model/userCreate");
-
-
+const Site = require("../../model/sites");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
@@ -21,13 +19,14 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 exports.createCheckSheet = async (req, res) => {
   try {
-
-    const data = await User.findById({ _id: req.body.inspectorid });
+    const data = await Site.findById(req.body.siteId);
     if (!data) {
-      return res.status(404).json({ message: "Inspector not found" });
+      return res.status(404).json({ message: "Cannot find site" });
     }
-
     let loca = data.location;
+    req.body.clientId = data.clientId;
+    req.body.circle = data.circle_state;
+    req.body.address = data.site_address;
     const checkSheet = await CheckSheet(req.body);
     checkSheet.location = loca;
     await checkSheet.save();
@@ -38,7 +37,6 @@ exports.createCheckSheet = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-// READ all check sheets
 exports.getAllCheckSheets = async (req, res) => {
   try {
     const checkSheets = await CheckSheet.find().populate("inspectorid");
@@ -47,7 +45,6 @@ exports.getAllCheckSheets = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-// READ a single check sheet by ID
 exports.getCheckSheetById = async (req, res) => {
   try {
     const checkSheet = await CheckSheet.findById(req.params.id).populate(
@@ -136,7 +133,6 @@ exports.updateCheckSheet = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
-// Update the addQuestionForInspect array with answerDropdown data
 // router.put("/questions/:questionId", async (req, res) => {
 //   try {
 //     const { questionId } = req.params;
@@ -224,14 +220,12 @@ exports.CheckAnswer = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-// Function to shuffle an array in-place
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
 }
-// DELETE a check sheet by ID
 exports.deleteCheckSheet = async (req, res) => {
   try {
     const checkSheet = await CheckSheet.findByIdAndDelete(req.params.id);
@@ -243,11 +237,10 @@ exports.deleteCheckSheet = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-// READ a single check sheet by ID
 exports.getCheckSheetBySiteId = async (req, res) => {
   try {
     const checkSheet = await CheckSheet.find({ siteId: req.params.id });
-    if (!checkSheet) {
+    if (checkSheet.length == 0) {
       return res.status(404).json({ message: "Check sheet not found" });
     }
     res.json({ msg: checkSheet });

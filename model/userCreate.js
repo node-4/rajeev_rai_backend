@@ -1,29 +1,75 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const validator = require("validator");
-
+const objectid = mongoose.Schema.Types.ObjectId;
 const userSchema = new mongoose.Schema({
+  inspectorName: {
+    type: String,
+  },
+  accessrequest: {
+    type: Boolean,
+    default: false,
+  },
+  siteName: {
+    type: String,
+  },
+  inspectionDate: {
+    type: String,
+  },
+  reportstatus: {
+    type: String,
+    enum: ["yes", "no"],
+  },
+  siteAllocated: {
+    type: Boolean,
+    //default:false
+  },
+  reviewerId: {
+    type: String,
+  },
+  reviewerName: {
+    type: String,
+  },
+  auditRequirements: [{
+    type: String,
+  }],
+  address: {
+    type: String,
+  },
+  uploadFileFromYourDevice: {
+    type: String
+  },
+  reviewStatus: {
+    type: Boolean,
+    default: false
+  },
+  reviewRemarks: {
+    type: String
+  },
+  circle: {
+    type: String
+  },
+  clientName: {
+    type: String,
+  },
+  designation: {
+    type: String,
+  },
+  circle_state: {
+    type: String,
+  },
+  representativeName: {
+    type: String,
+  },
   fullName: {
     type: String,
     //required: [true, "Please Enter your First name"],
     default: ""
   },
-  // middleName: {
-  //   type: String,
-  //   required: [true, "Please enter your Middle Name."],
-  // },
-  // lastName: {
-  //   type: String,
-  //   required: [true, "Please enter your Last name."],
-  // },
   employeeId: {
     type: String,
     default: ""
   },
   email: {
     type: String,
-    unique: true,
-    lowercase: true,
     default: ""
   },
   phone: {
@@ -32,7 +78,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    select: false,
   },
   confirmpassword: {
     type: String,
@@ -72,8 +117,12 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    //  enum: ["auditor", "admin"],
+    enum: ["admin", "auditor", "client", "reviewer", "subAdmin",],
     default: "",
+  },
+  auditorStatus: {
+    type: String,
+    enum: ["Pending", "Accept", "Reject",],
   },
   google_id: {
     type: String,
@@ -82,7 +131,6 @@ const userSchema = new mongoose.Schema({
   location: {
     type: {
       type: String,
-      // enum: ["Point"],
       default: "Point",
     },
     coordinates: {
@@ -90,10 +138,9 @@ const userSchema = new mongoose.Schema({
       default: [0, 0],
     },
   },
+  permissions: {
 
-  ////////////////////////////////////////////////
-
-
+  }
 });
 
 

@@ -12,4 +12,6 @@ Router.route("/getByUserId/:id").get(/*verifyToken,*/userController.getUserById)
 Router.route("/update/:id").put(/*verifyToken,*/userController.updateUser)
 Router.route("/updateLocationofUser/:id").put(/*verifyToken,*/userController.updateLocationofUser)
 Router.route("/forgetPassword").post(userController.forgetPassword);
+Router.route("/updateAuditorKyc/:id").put(userController.updateAuditorKyc)
+Router.route("/updateUserType/:id").put(userController.updateUserType)
 module.exports = Router;

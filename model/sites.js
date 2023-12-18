@@ -1,78 +1,88 @@
 const mongoose = require("mongoose");
 const objectid = mongoose.Schema.Types.ObjectId;
-
 const siteSchema = mongoose.Schema({
+  clientId: {
+    type: objectid,
+    ref: "User"
+  },
+  auditorId: {
+    type: objectid,
+    ref: "User"
+  },
+  reviewerId: {
+    type: objectid,
+    ref: "User"
+  },
   QA_CA_ID: {
     type: String,
-    default:""
+    default: ""
   },
-   Client_email: {
+  Client_email: {
     type: String,
-    default:""
+    default: ""
   },
   circle_state: {
     type: String,
-    default:""
+    default: ""
   },
-  location:{
-    type:String,
-    default:""
+  location: {
+    type: String,
+    default: ""
   },
-  siteId:{
-    type:String,
-    default:""
+  siteId: {
+    type: String,
+    default: ""
   },
   siteName: {
     type: String,
-    default:""
+    default: ""
   },
- site_address: {
+  site_address: {
     type: String,
-    default:""
+    default: ""
   },
-   dateAllocated: {
-    type: String,
-    default:""
+  dateAllocated: {
+    type: Date,
   },
   dueDate: {
     type: String,
-    default:""
+    default: ""
   },
   dateAuditScheduled: {
-    type: String,
-    default:""
+    type: Date,
   },
   InspectorName: {
     type: String,
-    default:""
+    default: ""
   },
   dateActualAudit: {
     type: String,
-    default:""
+    default: ""
   },
   reviewerName: {
     type: String,
-    default:""
+    default: ""
   },
   dateReviewed: {
     type: String,
-    default:""
+    default: ""
   },
   clientRepName: {
     type: String,
-    default:""
+    default: ""
   },
   DateClient: {
     type: String,
-    default:""
+    default: ""
   },
   uploadFileFromDevice: {
     type: String,
-    default:""
+    default: ""
   },
-  checksheet:[],
+  checksheet: [{
+    type: objectid,
+    ref: "checkSheet"
+  }],
 });
-
 const siteModel = mongoose.model("site", siteSchema);
-
 module.exports = siteModel;
