@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT || 3004;
 mongoose
-  .connect("mongodb+srv://node3:node3@cluster0.tcw8z5q.mongodb.net/audit_app?retryWrites=true&w=majority")
+  .connect("mongodb+srv://node3:node3@cluster0.tcw8z5q.mongodb.net/rajeevRai?retryWrites=true&w=majority")
   .then(() => { console.log("Db conneted succesfully"); }).catch((err) => {
     console.log(err);
   });
