@@ -1,6 +1,6 @@
 const Site = require("../../model/sites");
 const CheckSheet = require("../../model/CheckSheet");
-const clientModel = require('../../model/userCreate'); // Import the clientModel module
+const clientModel = require('../../model/userCreate'); 
 const XLSX = require("xlsx");
 const ExcelJS = require("exceljs");
 const fs = require("fs");
@@ -202,48 +202,5 @@ exports.downloadSite = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
-  }
-};
-exports.importCheckSheet = async (req, res) => {
-  try {
-    console.log(req.file);
-    const file = req.file;
-    const path = file.path;
-    const workbook = XLSX.readFile(file.path);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const orders = XLSX.utils.sheet_to_json(sheet);
-    for (const orderData of orders) {
-      const addQuestions = orderData["addQuestionForInspect"];
-      const questionArray = [];
-      for (const questionData of addQuestions) {
-        const questionObj = {
-          question: questionData["question"],
-          type: questionData["type"],
-        };
-        questionArray.push(questionObj);
-      }
-      const orderObj = {
-        nameOfCheckSheet: orderData["nameOfCheckSheet"],
-        revisionNumber: orderData["revisionNumber"],
-        uploadDocument: orderData["uploadDocument"],
-        siteId: orderData["siteId"],
-        inspectorid: orderData["inspectorid"],
-        addQuestionForInspect: questionArray,
-      };
-
-      const order = await CheckSheet.create(orderObj);
-    }
-
-    fs.unlink(path, (err) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Error deleting file" });
-      }
-    });
-
-    res.status(200).json({ message: "Data uploaded successfully" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: 0, message: error.message });
   }
 };
