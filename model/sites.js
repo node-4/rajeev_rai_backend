@@ -13,6 +13,10 @@ const siteSchema = mongoose.Schema({
     type: objectid,
     ref: "User"
   },
+  QACA_Activity_Type: {
+    type: String,
+    default: ""
+  },
   QA_CA_ID: {
     type: String,
     default: ""
@@ -51,11 +55,15 @@ const siteSchema = mongoose.Schema({
   dateAuditScheduled: {
     type: Date,
   },
-  InspectorName: {
-    type: String,
+  DateClient: {
+    type: Date,
     default: ""
   },
   dateActualAudit: {
+    type: String,
+    default: ""
+  },
+  InspectorName: {
     type: String,
     default: ""
   },
@@ -68,10 +76,6 @@ const siteSchema = mongoose.Schema({
     default: ""
   },
   clientRepName: {
-    type: String,
-    default: ""
-  },
-  DateClient: {
     type: String,
     default: ""
   },
