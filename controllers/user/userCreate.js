@@ -66,7 +66,7 @@ exports.loginWithPhone = async (req, res) => {
 };
 exports.signup = async (req, res) => {
   try {
-    const email = await User.findOne({ email: req.body.email, role: "auditor" });
+    const email = await User.findOne({ email: req.body.email, role: req.body.role });
     if (email) return res.status(200).send({ msg: "email already present " });
     const salt = await bcrypt.genSalt(10);
     if (req.body.password == (null || undefined)) {
@@ -79,7 +79,7 @@ exports.signup = async (req, res) => {
     } else {
       req.body.confirmpassword = await bcrypt.hash(req.body.confirmpassword, salt);
     }
-    req.body.role = "auditor";
+    req.body.role = req.body.role;
     req.body.auditorStatus = "Pending";
     const newUser = await User.create(req.body);
     return res.status(200).send({ msg: "true", newUser });
