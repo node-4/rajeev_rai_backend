@@ -96,7 +96,7 @@ exports.signup = async (req, res) => {
 };
 module.exports.getAll = async (req, res) => {
   try {
-    const sites = await User.find({ role: "auditor" });
+    const sites = await User.find({});
     return res.json(sites);
   } catch (err) {
     return res.status(500).json({ message: err.message });
