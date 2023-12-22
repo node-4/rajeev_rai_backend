@@ -46,7 +46,7 @@ exports.deleteReviewerById = async (req, res) => {
 };
 exports.getAllReviewerspopulate = async (req, res) => {
   try {
-    const reviewers = await reviewerModel.find({ role: "reviewer" }).populate('auditId');
+    const reviewers = await reviewerModel.find({ role: "reviewer" });
     res.status(200).json({ data: reviewers });
   } catch (err) {
     console.error(err);
