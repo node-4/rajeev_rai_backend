@@ -22,7 +22,7 @@ exports.createCheckSheet = async (req, res) => {
 };
 exports.getCheckSheetById = async (req, res) => {
   try {
-    const checkSheets = await CheckSheet.findById(req.params.id).populate("clientId siteId");
+    const checkSheets = await CheckSheet.findById(req.params.id).populate("clientId siteId CheckSheetQuestionId");
     if (!checkSheets) {
       return res.status(409).json({ status: 404, message: "checkSheets not found" });
     } else {
