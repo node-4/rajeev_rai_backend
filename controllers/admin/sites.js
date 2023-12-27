@@ -65,7 +65,7 @@ exports.assignSite = async (req, res) => {
 };
 module.exports.getSite = async (req, res) => {
   try {
-    const site = await Site.findById(req.params.id);
+    const site = await Site.findById(req.params.id).populate("clientId auditorId reviewerId");
     if (site == null) {
       return res.status(404).json({ message: "Cannot find site" });
     }
