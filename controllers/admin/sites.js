@@ -47,18 +47,14 @@ exports.assignSite = async (req, res) => {
     if (!site) {
       return res.status(404).json({ message: "Cannot find site" });
     } else {
-      if (req.body.assignedType == 'auditor') {
-        req.body.auditorId = req.body.assignedId;
-        req.body.dateAuditScheduled = new Date();
-      }
-      if (req.body.assignedType == 'reviewer') {
-        req.body.reviewerId = req.body.assignedId;
-        req.body.dateAllocated = new Date();
-      }
+      req.body.auditorId = req.body.auditorId;
+      req.body.dateAuditScheduled = req.body.dateAuditScheduled;
+      req.body.reviewerId = req.body.reviewerId;
+      req.body.dateAllocated = req.body.dateAllocated;
+      req.body.QACA_Product = req.body.QACA_Product;
       const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: req.body }, { new: true });
       return res.json(site1);
     }
-
   } catch (err) {
     return res.status(400).json({ message: err.message });
   }

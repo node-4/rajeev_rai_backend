@@ -17,6 +17,10 @@ const siteSchema = mongoose.Schema({
     type: String,
     default: ""
   },
+  QACA_Product: {
+    type: Array,
+    default: ""
+  },
   QA_CA_ID: {
     type: String,
     default: ""
