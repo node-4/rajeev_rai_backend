@@ -32,7 +32,7 @@ module.exports.getAllSites = async (req, res) => {
     if (req.query.reviewerId) {
       query1 = { reviewerId: req.query.reviewerId };
     }
-    const sites = await Site.find(query1);
+    const sites = await Site.find(query1).populate("clientId auditorId reviewerId");
     if (sites.length == 0) {
       return res.status(404).json({ status: 404, message: "No data found" });
     }
