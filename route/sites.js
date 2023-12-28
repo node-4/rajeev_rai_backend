@@ -11,7 +11,9 @@ const storage1 = multer.diskStorage({
         },
 });
 const upload1 = multer({ storage: storage1 });
-router.post("/admin/create/createSite", siteController.createSite);
+const { upload, } = require('../middleware/imageUpload')
+
+router.post("/admin/create/createSite", upload.single('uploadFileFromDevice'), siteController.createSite);
 router.put("/admin/assignSite/:id", siteController.assignSite);
 router.get("/admin/getAll/getAllSites", siteController.getAllSites);
 router.get("/admin/get/getSite/:id", siteController.getSite);

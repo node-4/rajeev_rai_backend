@@ -6,14 +6,18 @@ const ExcelJS = require("exceljs");
 const fs = require("fs");
 exports.createSite = async (req, res) => {
   try {
-    const { QA_CA_ID, QACA_Activity_Type, clientId, siteId, siteName, circle_state, location, site_address, uploadFileFromDevice, dueDate, dateAllocated } = req.body;
+    const { QA_CA_ID, QACA_Activity_Type, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated } = req.body;
     const client = await clientModel.findOne({ _id: clientId, role: "client" });
     if (!client) {
       return res.status(404).json({ error: 'Client not found' });
     }
     let clientRepName = client.representativeName;
     let Client_email = client.email;
-    const newSite = new Site({ QA_CA_ID, QACA_Activity_Type, Client_email, clientRepName, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated, uploadFileFromDevice, });
+    let uploadFileFromDevice;
+    if (req.file) {
+      uploadFileFromDevice = req.file ? req.file.path : "";
+    }
+    const newSite = new Site({ QA_CA_ID, QACA_Activity_Type, uploadFileFromDevice, Client_email, clientRepName, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated, uploadFileFromDevice, });
     const savedSite = await newSite.save();
     return res.status(201).json({ site: savedSite });
   } catch (err) {
