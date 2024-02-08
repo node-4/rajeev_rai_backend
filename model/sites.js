@@ -87,9 +87,9 @@ const siteSchema = mongoose.Schema({
     type: String,
     default: ""
   },
-  checksheet: [{
+  reportSites: [{
     type: objectid,
-    ref: "checkSheet"
+    ref: "reportSites"
   }],
 });
 const siteModel = mongoose.model("site", siteSchema);

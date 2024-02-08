@@ -1,5 +1,7 @@
 const Site = require("../../model/sites");
 const CheckSheet = require("../../model/CheckSheet");
+const reportSites = require("../../model/reportSites");
+const reportCheckSheetQuestion = require("../../model/reportCheckSheetQuestion");
 const clientModel = require('../../model/userCreate');
 const XLSX = require("xlsx");
 const ExcelJS = require("exceljs");
@@ -24,46 +26,7 @@ exports.createSite = async (req, res) => {
     return res.status(500).json({ error: "Failed to create site" }); // Handle any error that occurs
   }
 };
-module.exports.getAllSites = async (req, res) => {
-  try {
-    let query1 = {};
-    if (req.query.clientId) {
-      query1 = { clientId: req.query.clientId };
-    }
-    if (req.query.auditorId) {
-      query1 = { auditorId: req.query.auditorId };
-    }
-    if (req.query.reviewerId) {
-      query1 = { reviewerId: req.query.reviewerId };
-    }
-    const sites = await Site.find(query1).populate("clientId auditorId reviewerId");
-    if (sites.length == 0) {
-      return res.status(404).json({ status: 404, message: "No data found" });
-    }
-    return res.json({ status: 200, message: "Data found successfully.", msg: sites });
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-};
-exports.assignSite = async (req, res) => {
-  try {
-    const site = await Site.findById(req.params.id);
-    if (!site) {
-      return res.status(404).json({ message: "Cannot find site" });
-    } else {
-      req.body.auditorId = req.body.auditorId;
-      req.body.dateAuditScheduled = req.body.dateAuditScheduled;
-      req.body.reviewerId = req.body.reviewerId;
-      req.body.dateAllocated = req.body.dateAllocated;
-      req.body.QACA_Product = req.body.QACA_Product;
-      const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: req.body }, { new: true });
-      return res.json(site1);
-    }
-  } catch (err) {
-    return res.status(400).json({ message: err.message });
-  }
-};
-module.exports.getSite = async (req, res) => {
+exports.getSite = async (req, res) => {
   try {
     const site = await Site.findById(req.params.id).populate("clientId auditorId reviewerId");
     if (site == null) {
@@ -85,7 +48,7 @@ exports.updateSite = async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 };
-module.exports.deleteSite = async (req, res) => {
+exports.deleteSite = async (req, res) => {
   try {
     const site = await Site.findById(req.params.id);
     if (site == null) {
@@ -97,26 +60,25 @@ module.exports.deleteSite = async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 };
-exports.getAllClientNames = async (req, res) => {
+exports.getAllSites = async (req, res) => {
   try {
-    // Fetch all documents from the site collection in the database
-    const CheckSheet1 = await CheckSheet.find({ siteId: req.params.id });
-    if (CheckSheet1 == null) {
-      return res.status(404).json({ message: "Cannot find CheckSheet" });
+    let query1 = {};
+    if (req.query.clientId) {
+      query1 = { clientId: req.query.clientId };
     }
-    // Extract client names from the fetched documents
-    // const clientNames = CheckSheet1.map((ch) => ch._id , ch.nameOfCheckSheet);
-    const clientNames = CheckSheet1.map(ch => ({ _id: ch._id, nameOfCheckSheet: ch.nameOfCheckSheet }));
-
-    const site = await Site.findById(req.params.id);
-    site.checksheet = clientNames
-    await site.save()
-    // Send the client names as the response
-    return res.status(200).json({ msg: site });
+    if (req.query.auditorId) {
+      query1 = { auditorId: req.query.auditorId };
+    }
+    if (req.query.reviewerId) {
+      query1 = { reviewerId: req.query.reviewerId };
+    }
+    const sites = await Site.find(query1).populate("clientId auditorId reviewerId");
+    if (sites.length == 0) {
+      return res.status(404).json({ status: 404, message: "No data found" });
+    }
+    return res.json({ status: 200, message: "Data found successfully.", msg: sites });
   } catch (err) {
-    // Handle any errors that occur during the database operation
-    console.error("Error getting client names:", err);
-    return res.status(500).json({ error: "Failed to get client names" });
+    return res.status(500).json({ message: err.message });
   }
 };
 exports.importSite = async (req, res) => {
@@ -202,5 +164,78 @@ exports.downloadSite = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+};
+
+
+
+
+
+exports.assignSite = async (req, res) => {
+  try {
+    const site = await Site.findById(req.params.id);
+    if (!site) {
+      return res.status(404).json({ message: "Cannot find site" });
+    } else {
+
+      let reportCheckSheetQuestionObj = {
+        siteId: site._id,
+        checkSheetId: {
+          type: objectid,
+          ref: "checkSheet"
+        },
+        checkSheetQuestionId: {
+          type: objectid,
+          ref: "CheckSheetQuestion"
+        },
+      }
+      let reportSitesObj = {
+        clientId: {
+          type: objectid,
+          ref: "User"
+        },
+        auditorId: req.body.auditorId,
+        reviewerId: req.body.reviewerId,
+        siteId: {
+          type: objectid,
+          ref: "site"
+        },
+        dateAllocated: req.body.dateAllocated,
+        dateAuditScheduled: req.body.dateAuditScheduled,
+        dateActualAudit: {
+          type: String,
+          default: ""
+        },
+        checksheet: [{
+          type: objectid,
+          ref: "checkSheet"
+        }],
+        reportCheckSheetQuestion: [{
+          type: objectid,
+          ref: "reportCheckSheetQuestion"
+        }],
+      }
+      const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: req.body }, { new: true });
+      return res.json(site1);
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+exports.getAllClientNames = async (req, res) => {
+  try {
+    const CheckSheet1 = await CheckSheet.find({ siteId: req.params.id });
+    if (CheckSheet1 == null) {
+      return res.status(404).json({ message: "Cannot find CheckSheet" });
+    }
+    const clientNames = CheckSheet1.map(ch => ({ _id: ch._id, nameOfCheckSheet: ch.nameOfCheckSheet }));
+    const site = await Site.findById(req.params.id);
+    site.checksheet = clientNames
+    await site.save()
+    return res.status(200).json({ msg: site });
+  } catch (err) {
+    // Handle any errors that occur during the database operation
+    console.error("Error getting client names:", err);
+    return res.status(500).json({ error: "Failed to get client names" });
   }
 };

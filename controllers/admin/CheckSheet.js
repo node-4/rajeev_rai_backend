@@ -7,11 +7,6 @@ const ExcelJS = require("exceljs");
 const fs = require("fs");
 exports.createCheckSheet = async (req, res) => {
   try {
-    const data = await Site.findById(req.body.siteId);
-    if (!data) {
-      return res.status(404).json({ status: 404, message: "Cannot find site" });
-    }
-    req.body.clientId = data.clientId;
     const checkSheet = await CheckSheet(req.body);
     await checkSheet.save();
     return res.status(200).json({ status: 200, message: "Checksheet create successfully", checkSheet });
@@ -22,7 +17,7 @@ exports.createCheckSheet = async (req, res) => {
 };
 exports.getCheckSheetById = async (req, res) => {
   try {
-    const checkSheets = await CheckSheet.findById(req.params.id).populate("clientId siteId CheckSheetQuestionId");
+    const checkSheets = await CheckSheet.findById(req.params.id).populate("CheckSheetQuestionId");
     if (!checkSheets) {
       return res.status(409).json({ status: 404, message: "checkSheets not found" });
     } else {
@@ -38,25 +33,10 @@ exports.updatedCheckSheet = async (req, res) => {
     if (!checkSheets) {
       return res.status(409).json({ status: 404, message: "checkSheets not found" });
     } else {
-      let siteId, clientId;
-      if (req.body.siteId != (null || undefined)) {
-        const data = await Site.findById(req.body.siteId);
-        if (!data) {
-          return res.status(404).json({ status: 404, message: "Cannot find site" });
-        } else {
-          siteId = data._id;
-          clientId = data.clientId;
-        }
-      } else {
-        siteId = checkSheets.siteId;
-        clientId = checkSheets.clientId;
-      }
       let obj = {
         nameOfCheckSheet: req.body.nameOfCheckSheet || checkSheets.nameOfCheckSheet,
         revisionNumber: req.body.revisionNumber || checkSheets.revisionNumber,
         id: req.body.id || checkSheets.id,
-        siteId: siteId,
-        clientId: clientId,
       }
       let update = await CheckSheet.findByIdAndUpdate({ _id: checkSheets._id }, { $set: obj }, { new: true });
       if (update) {
@@ -83,7 +63,7 @@ exports.deleteCheckSheet = async (req, res) => {
 };
 exports.getAllCheckSheets = async (req, res) => {
   try {
-    const checkSheets = await CheckSheet.find().populate("clientId siteId");
+    const checkSheets = await CheckSheet.find()
     if (checkSheets.length == 0) {
       return res.status(409).json({ status: 404, message: "checkSheets not found" });
     } else {
@@ -156,6 +136,12 @@ exports.getAllCheckSheetQuestion = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+
+
+
+
+
 exports.answerProvide = async (req, res) => {
   try {
     const { answer, isAnswer, remarks } = req.body;
@@ -225,20 +211,12 @@ exports.importCheckSheet = async (req, res) => {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const orders = XLSX.utils.sheet_to_json(sheet);
     orders.forEach(async (orderData) => {
-      let clientId, siteId;
-      const data = await Site.findById(orderData["siteId"]);
-      if (data) {
-        clientId = data.clientId;
-        siteId = data._id;;
-        const orderObj = {
-          nameOfCheckSheet: orderData["nameOfCheckSheet"],
-          revisionNumber: orderData["revisionNumber"],
-          id: orderData["id"],
-          siteId: siteId,
-          clientId: clientId,
-        };
-        const order = await CheckSheet.create(orderObj);
-      }
+      const orderObj = {
+        nameOfCheckSheet: orderData["nameOfCheckSheet"],
+        revisionNumber: orderData["revisionNumber"],
+        id: orderData["id"],
+      };
+      const order = await CheckSheet.create(orderObj);
     });
     fs.unlink(path, (err) => {
       if (err) {
