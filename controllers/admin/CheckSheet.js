@@ -1,5 +1,7 @@
 const CheckSheet = require("../../model/CheckSheet");
 const CheckSheetQuestion = require("../../model/CheckSheetQuestion");
+const reportSites = require("../../model/reportSites");
+const reportCheckSheetQuestion = require("../../model/reportCheckSheetQuestion");
 const User = require("../../model/userCreate");
 const Site = require("../../model/sites");
 const XLSX = require("xlsx");
@@ -136,27 +138,26 @@ exports.getAllCheckSheetQuestion = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
-
-
-
-
 exports.answerProvide = async (req, res) => {
   try {
     const { answer, isAnswer, remarks } = req.body;
-    let findData = await CheckSheetQuestion.findOne({ _id: req.params.questionId });
+    let findData = await reportCheckSheetQuestion.findOne({ _id: req.params.questionId });
     if (!findData) {
-      return res.status(404).json({ status: 404, message: "CheckSheetQuestion not found" });
+      return res.status(404).json({ status: 404, message: "ReportCheckSheetQuestion not found" });
     } else {
       let photo;
       if (req.file) {
         photo = req.file.path;
       }
-      let obj = { answer: answer, isAnswer: isAnswer, photo: photo, remarks: remarks };
-      const checkSheet1 = await CheckSheetQuestion.findByIdAndUpdate({ _id: req.params.questionId }, { $set: obj }, { new: true });
-      if (checkSheet1) {
-        return res.status(200).json({ status: 200, message: "Answer provide successfully", checkSheet1 });
+      const checkSheet1 = await reportCheckSheetQuestion.findByIdAndUpdate({ _id: req.params.questionId }, { $set: { answer: answer, photo: photo, remarks: remarks } }, { new: true });
+      if (isAnswer == 'true') {
+        const findData12 = await reportSites.findOne({ "checkSheetQuestion.reportCheckSheetQuestionId": req.params.questionId });
+        if (findData12) {
+          const updatedReportSites = await reportSites.findOneAndUpdate({ "checkSheetQuestion.reportCheckSheetQuestionId": req.params.questionId }, { $set: { "checkSheetQuestion.$.isAnswer": isAnswer } }, { new: true });
+          return res.status(200).json({ status: 200, message: "Answer provided successfully", updatedReportSites });
+        }
+      } else {
+        return res.status(200).json({ status: 200, message: "Answer provided successfully", checkSheet1 });
       }
     }
   } catch (err) {
@@ -166,11 +167,11 @@ exports.answerProvide = async (req, res) => {
 exports.updateCheckSheetSubmitted = async (req, res) => {
   try {
     const checkSheetId = req.params.id;
-    const checkSheets = await CheckSheet.findById({ _id: checkSheetId });
+    const checkSheets = await reportSites.findById({ _id: checkSheetId });
     if (!checkSheets) {
       return res.status(404).json({ status: 404, message: "checkSheets not found" });
     } else {
-      const updatedCheckSheet = await CheckSheet.findByIdAndUpdate({ _id: checkSheets._id }, { $set: { submitted: "true" } }, { new: true });
+      const updatedCheckSheet = await reportSites.findByIdAndUpdate({ _id: checkSheets._id }, { $set: { submitted: true } }, { new: true });
       return res.status(200).json({ status: 200, message: "Update checkSheet submitted successfully", updatedCheckSheet });
     }
   } catch (error) {
@@ -180,7 +181,7 @@ exports.updateCheckSheetSubmitted = async (req, res) => {
 };
 exports.getSubmittedCheckSheets = async (req, res) => {
   try {
-    const submittedCheckSheets = await CheckSheet.find({ submitted: "true" });
+    const submittedCheckSheets = await reportSites.find({ submitted: true }).populate([{ path: "clientId" }, { path: "auditorId" }, { path: "siteId" }, { path: "reviewerId" }, { path: "checksheet" }, { path: "checkSheetQuestion", populate: { path: "reportCheckSheetQuestionId", populate: { path: "checkSheetQuestionId", } } }]);;
     if (submittedCheckSheets.length == 0) {
       return res.status(409).json({ status: 404, message: "Submitted check sheets not found" });
     } else {

@@ -5,6 +5,7 @@ const reportCheckSheetQuestion = require("../../model/reportCheckSheetQuestion")
 const clientModel = require('../../model/userCreate');
 const XLSX = require("xlsx");
 const ExcelJS = require("exceljs");
+const mongoose = require("mongoose");
 const fs = require("fs");
 exports.createSite = async (req, res) => {
   try {
@@ -72,7 +73,7 @@ exports.getAllSites = async (req, res) => {
     if (req.query.reviewerId) {
       query1 = { reviewerId: req.query.reviewerId };
     }
-    const sites = await Site.find(query1).populate("clientId auditorId reviewerId");
+    const sites = await Site.find(query1).populate("clientId");
     if (sites.length == 0) {
       return res.status(404).json({ status: 404, message: "No data found" });
     }
@@ -166,60 +167,75 @@ exports.downloadSite = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
-
-
-
-
-
 exports.assignSite = async (req, res) => {
   try {
     const site = await Site.findById(req.params.id);
     if (!site) {
       return res.status(404).json({ message: "Cannot find site" });
     } else {
-
-      let reportCheckSheetQuestionObj = {
-        siteId: site._id,
-        checkSheetId: {
-          type: objectid,
-          ref: "checkSheet"
-        },
-        checkSheetQuestionId: {
-          type: objectid,
-          ref: "CheckSheetQuestion"
-        },
+      let reportSite = [];
+      for (let i = 0; i < req.body.checkSheetId.length; i++) {
+        let checkSheet1 = await CheckSheet.findById(req.body.checkSheetId[i]);
+        if (checkSheet1) {
+          let checkSheetQuestion = [];
+          for (let j = 0; j < checkSheet1.CheckSheetQuestionId.length; j++) {
+            let obj1 = {
+              siteId: site.clientId,
+              checkSheetId: checkSheet1._id,
+              checkSheetQuestionId: checkSheet1.CheckSheetQuestionId[i],
+            }
+            const landData1 = await reportCheckSheetQuestion.create(obj1);
+            let obj = {
+              reportCheckSheetQuestionId: landData1._id,
+            }
+            checkSheetQuestion.push(obj);
+          }
+          let reportSitesObj = {
+            clientId: site.clientId,
+            auditorId: req.body.auditorId,
+            reviewerId: req.body.reviewerId,
+            siteId: site._id,
+            dateAllocated: req.body.dateAllocated,
+            dateAuditScheduled: req.body.dateAuditScheduled,
+            checksheet: req.body.checkSheetId[i],
+            checkSheetQuestion: checkSheetQuestion,
+          }
+          const landData = await reportSites.create(reportSitesObj);
+          if (landData) {
+            reportSite.push(landData._id)
+            for (let k = 0; k < landData.checkSheetQuestion.length; k++) {
+              const landData1 = await reportCheckSheetQuestion.findById({ _id: landData.checkSheetQuestion[k].reportCheckSheetQuestionId });
+              await reportCheckSheetQuestion.findByIdAndUpdate({ _id: landData1._id }, { $set: { reportSitesId: landData._id } }, { new: true });
+            }
+          }
+        }
       }
-      let reportSitesObj = {
-        clientId: {
-          type: objectid,
-          ref: "User"
-        },
-        auditorId: req.body.auditorId,
-        reviewerId: req.body.reviewerId,
-        siteId: {
-          type: objectid,
-          ref: "site"
-        },
-        dateAllocated: req.body.dateAllocated,
-        dateAuditScheduled: req.body.dateAuditScheduled,
-        dateActualAudit: {
-          type: String,
-          default: ""
-        },
-        checksheet: [{
-          type: objectid,
-          ref: "checkSheet"
-        }],
-        reportCheckSheetQuestion: [{
-          type: objectid,
-          ref: "reportCheckSheetQuestion"
-        }],
-      }
-      const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: req.body }, { new: true });
-      return res.json(site1);
+      const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: { reportSites: reportSite } }, { new: true });
+      return res.json({ status: 200, message: "Check sheet assigned successfully.", site1 });
     }
   } catch (err) {
     return res.status(400).json({ message: err.message });
+  }
+};
+exports.getAllSitesForAuditorOrReviewer = async (req, res) => {
+  try {
+    let query1 = {};
+    if (req.query.clientId) {
+      query1 = { clientId: req.query.clientId };
+    }
+    if (req.query.auditorId) {
+      query1 = { auditorId: req.query.auditorId };
+    }
+    if (req.query.reviewerId) {
+      query1 = { reviewerId: req.query.reviewerId };
+    }
+    const sites = await reportSites.find(query1).populate([{ path: "clientId" }, { path: "auditorId" }, { path: "siteId" }, { path: "reviewerId" }, { path: "checksheet" }, { path: "checkSheetQuestion", populate: { path: "reportCheckSheetQuestionId", populate: { path: "checkSheetQuestionId", } } }]);
+    if (sites.length == 0) {
+      return res.status(404).json({ status: 404, message: "No data found" });
+    }
+    return res.json({ status: 200, message: "Data found successfully.", msg: sites });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
 };
 exports.getAllClientNames = async (req, res) => {

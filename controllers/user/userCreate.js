@@ -43,7 +43,7 @@ module.exports.verifyOTP = async (req, res) => {
 };
 exports.loginWithPhone = async (req, res) => {
   try {
-    const phone = await User.findOne({ phone: req.body.phone, role: "auditor" });
+    const phone = await User.findOne({ phone: req.body.phone, role: "auditor", status: "Active" });
     if (phone) {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       let update = await User.findByIdAndUpdate({ _id: phone._id }, { $set: { otp: otp } }, { new: true });
@@ -133,7 +133,7 @@ exports.login = async (req, res, next) => {
   if (validator.isEmail(input)) {
     var email = input;
 
-    const user = await User.findOne({ email: email, role: "auditor" }).select("+password");
+    const user = await User.findOne({ email: email, role: "auditor", status: "Active" }).select("+password");
     console.log(user.password);
 
     if (!user /*|| !(await user.correctPassword(password, user.password))*/) {
@@ -201,7 +201,7 @@ exports.forgetPassword = async (req, res, next) => {
 
   try {
     // Check if the admin exists
-    const admin = await User.findOne({ email });
+    const admin = await User.findOne({ email, status: "Active" });
     if (!admin) return res.status(404).json({ message: " not found" });
 
     // Generate a random password

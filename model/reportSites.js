@@ -27,14 +27,24 @@ const siteSchema = mongoose.Schema({
     type: String,
     default: ""
   },
-  checksheet: [{
+  submitted: {
+    type: Boolean,
+    default: false,
+  },
+  checkSheetQuestion: [{
+    isAnswer: {
+      type: Boolean,
+      default: false,
+    },
+    reportCheckSheetQuestionId: {
+      type: objectid,
+      ref: "reportCheckSheetQuestion"
+    },
+  }],
+  checksheet: {
     type: objectid,
     ref: "checkSheet"
-  }],
-  reportCheckSheetQuestion: [{
-    type: objectid,
-    ref: "reportCheckSheetQuestion"
-  }],
+  },
 });
 const siteModel = mongoose.model("reportSites", siteSchema);
 module.exports = siteModel;

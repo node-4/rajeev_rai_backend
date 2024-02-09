@@ -22,5 +22,6 @@ router.patch("/admin/update/updateSite/:id", siteController.updateSite);
 router.delete("/admin/delete/deleteSite/:id", siteController.deleteSite);
 router.post("/admin/uploadSite", upload1.single("file"), siteController.importSite);
 router.get("/admin/downloadSite", siteController.downloadSite);
+router.get("/admin/getAll/getAllSitesForAuditorOrReviewer", siteController.getAllSitesForAuditorOrReviewer);
 
 module.exports = router;

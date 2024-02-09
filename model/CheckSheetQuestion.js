@@ -9,10 +9,6 @@ const checkSheetSchema = mongoose.Schema({
     type: String,
     default: "",
   },
-  isAnswer: {
-    type: String,
-    default: "false",
-  },
   question: {
     type: String,
     default: "",

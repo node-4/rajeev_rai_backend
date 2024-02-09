@@ -13,14 +13,6 @@ const checkSheetSchema = mongoose.Schema({
     type: String,
     default: "",
   },
-  siteId: {
-    type: objectid,
-    ref: "site",
-  },
-  clientId: {
-    type: objectid,
-    ref: "User"
-  },
   CheckSheetQuestionId: [{
     type: objectid,
     ref: "CheckSheetQuestion",

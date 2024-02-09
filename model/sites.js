@@ -5,14 +5,6 @@ const siteSchema = mongoose.Schema({
     type: objectid,
     ref: "User"
   },
-  auditorId: {
-    type: objectid,
-    ref: "User"
-  },
-  reviewerId: {
-    type: objectid,
-    ref: "User"
-  },
   QACA_Activity_Type: {
     type: String,
     default: ""
