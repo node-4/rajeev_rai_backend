@@ -29,7 +29,7 @@ exports.createSite = async (req, res) => {
 };
 exports.getSite = async (req, res) => {
   try {
-    const site = await Site.findById(req.params.id).populate("clientId auditorId reviewerId");
+    const site = await Site.findById(req.params.id).populate("clientId reportSites");
     if (site == null) {
       return res.status(404).json({ message: "Cannot find site" });
     }
