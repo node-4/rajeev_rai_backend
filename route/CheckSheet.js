@@ -16,6 +16,7 @@ router.delete("/admin/delete/checkSheet/:id", checkSheetController.deleteCheckSh
 router.get("/admin/getAll/checkSheet", checkSheetController.getAllCheckSheets);
 router.get("/check/getSubmittedCheckSheets", checkSheetController.getSubmittedCheckSheets)
 router.get("/getCheckSheetBySiteId/:id", checkSheetController.getCheckSheetBySiteId)
+router.get("/getReportSitesById/:id", checkSheetController.getReportSitesById)
 
 router.post("/admin/addQuestionInChecklist", checkSheetController.addQuestionInCheckSheetId)
 router.get("/admin/getById/Question/:id", checkSheetController.getCheckSheetQuestionById);

@@ -183,9 +183,22 @@ exports.getSubmittedCheckSheets = async (req, res) => {
   try {
     const submittedCheckSheets = await reportSites.find({ submitted: true }).populate([{ path: "clientId" }, { path: "auditorId" }, { path: "siteId" }, { path: "reviewerId" }, { path: "checksheet" }, { path: "checkSheetQuestion", populate: { path: "reportCheckSheetQuestionId", populate: { path: "checkSheetQuestionId", } } }]);;
     if (submittedCheckSheets.length == 0) {
-      return res.status(409).json({ status: 404, message: "Submitted check sheets not found" });
+      return res.status(409).json({ status: 404, message: "ReportSites not found" });
     } else {
-      return res.status(200).json({ status: 200, message: "Submitted check sheets found", data: submittedCheckSheets });
+      return res.status(200).json({ status: 200, message: "ReportSites found", data: submittedCheckSheets });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+exports.getReportSitesById = async (req, res) => {
+  try {
+    const submittedCheckSheets = await reportSites.findById({ _id: req.params.id }).populate([{ path: "clientId" }, { path: "auditorId" }, { path: "siteId" }, { path: "reviewerId" }, { path: "checksheet" }, { path: "checkSheetQuestion", populate: { path: "reportCheckSheetQuestionId", populate: { path: "checkSheetQuestionId", } } }]);;
+    if (!submittedCheckSheets) {
+      return res.status(409).json({ status: 404, message: "ReportSites not found" });
+    } else {
+      return res.status(200).json({ status: 200, message: "ReportSites found", data: submittedCheckSheets });
     }
   } catch (error) {
     console.log(error);

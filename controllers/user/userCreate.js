@@ -308,3 +308,16 @@ exports.updateUserType = async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 };
+exports.updateUserStatus = async (req, res) => {
+  try {
+    const site = await User.findById(req.params.id);
+    if (!site) {
+      return res.status(404).json({ message: "Cannot find User" });
+    } else {
+      const site1 = await User.findByIdAndUpdate({ _id: site._id }, { $set: { status: req.body.status } }, { new: true });
+      return res.json(site1);
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
