@@ -100,6 +100,24 @@ exports.addQuestionInCheckSheetId = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+exports.updateQuestionInCheckSheetId = async (req, res) => {
+  try {
+    let findData = await CheckSheetQuestion.findOne({ _id: req.params.id })
+    let obj = {
+      checkSheetId: findData.checkSheetId,
+      questionNo: findData.questionNo,
+      question: req.body.question || findData.question,
+      type: req.body.type || findData.type,
+      answerDropdown: req.body.answerDropdown || findData.answerDropdown,
+      photo: req.body.photo || findData.photo,
+      remarks: req.body.remarks || findData.remarks,
+    };
+    const checkSheet1 = await CheckSheetQuestion.findByIdAndUpdate({ _id: findData._id }, { $set: obj }, { new: true });
+    return res.status(200).json({ status: 200, message: "CheckSheet Question create successfully", checkSheet1 });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 exports.getCheckSheetQuestionById = async (req, res) => {
   try {
     const checkSheets = await CheckSheetQuestion.findById(req.params.id).populate("checkSheetId");

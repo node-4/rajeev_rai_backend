@@ -20,6 +20,7 @@ router.get("/getReportSitesById/:id", checkSheetController.getReportSitesById)
 
 router.post("/admin/addQuestionInChecklist", checkSheetController.addQuestionInCheckSheetId)
 router.get("/admin/getById/Question/:id", checkSheetController.getCheckSheetQuestionById);
+router.put("/admin/update/Question/:id", checkSheetController.updateQuestionInCheckSheetId);
 router.delete("/admin/delete/CheckSheetQuestion/:id", checkSheetController.deleteCheckSheetQuestion)
 router.get("/admin/getCheckSheetQuestionBycheckSheetId/:checkSheetId", checkSheetController.getAllCheckSheetQuestion);
 

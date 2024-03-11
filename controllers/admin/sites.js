@@ -9,7 +9,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 exports.createSite = async (req, res) => {
   try {
-    const { QA_CA_ID, QACA_Activity_Type, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated } = req.body;
+    const { QA_CA_ID, QACA_Activity_Type, QACA_Activity_TypeOther, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated } = req.body;
     const client = await clientModel.findOne({ _id: clientId, role: "client" });
     if (!client) {
       return res.status(404).json({ error: 'Client not found' });
@@ -20,7 +20,7 @@ exports.createSite = async (req, res) => {
     if (req.file) {
       uploadFileFromDevice = req.file ? req.file.path : "";
     }
-    const newSite = new Site({ QA_CA_ID, QACA_Activity_Type, uploadFileFromDevice, Client_email, clientRepName, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated, uploadFileFromDevice, });
+    const newSite = new Site({ QA_CA_ID, QACA_Activity_Type, QACA_Activity_TypeOther, uploadFileFromDevice, Client_email, clientRepName, clientId, siteId, siteName, circle_state, location, site_address, dueDate, dateAllocated, uploadFileFromDevice, });
     const savedSite = await newSite.save();
     return res.status(201).json({ site: savedSite });
   } catch (err) {
