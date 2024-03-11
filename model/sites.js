@@ -9,6 +9,10 @@ const siteSchema = mongoose.Schema({
     type: String,
     default: ""
   },
+  QACA_Activity_TypeOther: {
+    type: String,
+    default: ""
+  },
   QACA_Product: {
     type: Array,
     default: ""

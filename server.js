@@ -40,6 +40,5 @@ app.use("/api/v1/imagee", require("./route/image"))
 const server = app.listen(port, () => {
   console.log(`Listening on Port ${port}`);
 });
-module.exports = {
-  handler: serverless(app),
-};
+module.exports = app;
+module.exports.handler = serverless(app);

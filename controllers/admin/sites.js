@@ -93,13 +93,17 @@ exports.importSite = async (req, res) => {
     orders.forEach(async (orderData) => {
       const orderObj = {
         QA_CA_ID: orderData["QA_CA_ID"],
+        QACA_Activity_Type: orderData["QACA_Activity_Type"],
+        QACA_Activity_TypeOther: orderData["QACA_Activity_TypeOther"],
         siteId: orderData["siteId"],
+        siteName: orderData["siteName"],
         circle_state: orderData["circle_state"],
         location: orderData["location"],
         site_address: orderData["site_address"],
         clientRepName: orderData["clientRepName"],
-        DateClient: orderData["DateClient"],
+        dueDate: orderData["dueDate"],
         InspectorName: orderData["InspectorName"],
+        dateAllocated: orderData["dateAllocated"],
         uploadFileFromDevice: orderData["uploadFileFromDevice"],
       };
       const order = await Site.create(orderObj);
