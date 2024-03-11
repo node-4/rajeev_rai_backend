@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
   },
+  gstNo: {
+    type: String,
+  },
   uploadFileFromYourDevice: {
     type: String
   },

@@ -26,6 +26,9 @@ router.get("/admin/getCheckSheetQuestionBycheckSheetId/:checkSheetId", checkShee
 
 router.put("/admin/answerProvide/:questionId", upload.single('file'), checkSheetController.answerProvide);
 router.put("/updateCheckSheetSubmitted/:id", checkSheetController.updateCheckSheetSubmitted)
+router.delete("/admin/delete/ReportSites/:id", checkSheetController.deleteReportSites)
+router.get("/admin/getAllReportSites", checkSheetController.getAllReportSites);
+router.put("/admin/updateReportSites/:id", checkSheetController.updateReportSites)
 
 
 //ADMIN
