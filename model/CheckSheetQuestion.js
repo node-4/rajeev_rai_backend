@@ -15,7 +15,7 @@ const checkSheetSchema = mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["Text", "Number", "Dropdown", "Data", "Photo", "Remark"],
+    enum: ["Text", "Number", "Dropdown", "Data", "Photo", "Remark", "multiple"],
     default: "",
   },
   answerDropdown: [],

@@ -20,6 +20,9 @@ const checkSheetSchema = mongoose.Schema({
   answer: {
     type: String,
   },
+  multipleAnswer: {
+    type: Array,
+  },
   photo: {
     type: String,
   },

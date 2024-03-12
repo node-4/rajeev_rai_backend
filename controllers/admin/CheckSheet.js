@@ -37,7 +37,7 @@ exports.updatedCheckSheet = async (req, res) => {
     } else {
       let obj = {
         nameOfCheckSheet: req.body.nameOfCheckSheet || checkSheets.nameOfCheckSheet,
-        revisionNumber: req.body.revisionNumber || checkSheets.revisionNumber,
+        revisionNumber: checkSheets.revisionNumber,
         id: req.body.id || checkSheets.id,
       }
       let update = await CheckSheet.findByIdAndUpdate({ _id: checkSheets._id }, { $set: obj }, { new: true });
@@ -93,7 +93,7 @@ exports.addQuestionInCheckSheetId = async (req, res) => {
       };
       const checkSheet1 = await CheckSheetQuestion(obj);
       await checkSheet1.save();
-      let update = await CheckSheet.findByIdAndUpdate({ _id: checkSheets._id }, { $push: { CheckSheetQuestionId: checkSheet1._id } }, { new: true });
+      let update = await CheckSheet.findByIdAndUpdate({ _id: checkSheets._id }, { $push: { CheckSheetQuestionId: checkSheet1._id }, $set: { revisionNumber: checkSheets.revisionNumber + 1 } }, { new: true });
       return res.status(200).json({ status: 200, message: "CheckSheet Question create successfully", checkSheet1 });
     }
   } catch (error) {
@@ -113,6 +113,11 @@ exports.updateQuestionInCheckSheetId = async (req, res) => {
       remarks: req.body.remarks || findData.remarks,
     };
     const checkSheet1 = await CheckSheetQuestion.findByIdAndUpdate({ _id: findData._id }, { $set: obj }, { new: true });
+    const checkSheets = await CheckSheet.findById({ _id: findData.checkSheetId });
+    if (!checkSheets) {
+      return res.status(404).json({ status: 404, message: "checkSheets not found" });
+    }
+    let update = await CheckSheet.findByIdAndUpdate({ _id: findData.checkSheetId }, { $set: { revisionNumber: checkSheets.revisionNumber + 1 } }, { new: true });
     return res.status(200).json({ status: 200, message: "CheckSheet Question create successfully", checkSheet1 });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -132,14 +137,18 @@ exports.getCheckSheetQuestionById = async (req, res) => {
 };
 exports.deleteCheckSheetQuestion = async (req, res) => {
   try {
+    let checkSheetId;
     const checkSheets = await CheckSheetQuestion.findById(req.params.id);
     if (!checkSheets) {
       return res.status(409).json({ status: 404, message: "CheckSheetQuestion not found" });
     }
-    const checkSheet1 = await CheckSheetQuestion.findByIdAndDelete({ _id: checkSheets._id });
+    checkSheetId = findData.checkSheetId;
+    const checkSheet1 = await CheckSheetQuestion.findByIdAndDelete({ _id: checkSheetId });
     if (checkSheet1) {
+      let update = await CheckSheet.findByIdAndUpdate({ _id: checkSheetId }, { $pull: { CheckSheetQuestionId: checkSheet1._id }, $set: { revisionNumber: checkSheets.revisionNumber + 1 } }, { new: true });
       return res.status(200).json({ status: 200, message: "CheckSheetQuestion delete successfully." });
     }
+
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

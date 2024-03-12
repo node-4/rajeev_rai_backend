@@ -6,8 +6,8 @@ const checkSheetSchema = mongoose.Schema({
     default: "",
   },
   revisionNumber: {
-    type: String,
-    default: "",
+    type: Number,
+    default: 1,
   },
   id: {
     type: String,
