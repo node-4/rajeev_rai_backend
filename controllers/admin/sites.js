@@ -40,6 +40,9 @@ exports.getSite = async (req, res) => {
 };
 exports.updateSite = async (req, res) => {
   try {
+    if (req.file) {
+      req.body.uploadFileFromDevice = req.file ? req.file.path : "";
+    }
     const site = await Site.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!site) {
       return res.status(404).json({ message: 'Site not found' });

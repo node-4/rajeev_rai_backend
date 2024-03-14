@@ -18,7 +18,7 @@ router.put("/admin/assignSite/:id", siteController.assignSite);
 router.get("/admin/getAll/getAllSites", siteController.getAllSites);
 router.get("/admin/get/getSite/:id", siteController.getSite);
 router.get("/admin/getAllClientNames/:id", siteController.getAllClientNames)
-router.patch("/admin/update/updateSite/:id", siteController.updateSite);
+router.patch("/admin/update/updateSite/:id", upload.single('uploadFileFromDevice'), siteController.updateSite);
 router.delete("/admin/delete/deleteSite/:id", siteController.deleteSite);
 router.post("/admin/uploadSite", upload1.single("file"), siteController.importSite);
 router.get("/admin/downloadSite", siteController.downloadSite);
