@@ -53,6 +53,9 @@ const userSchema = new mongoose.Schema({
   clientName: {
     type: String,
   },
+  companyName: {
+    type: String,
+  },
   designation: {
     type: String,
   },
