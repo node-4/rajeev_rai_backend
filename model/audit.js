@@ -4,7 +4,7 @@ const objectid = mongoose.Schema.Types.ObjectId
 const auditSchema = mongoose.Schema({
   siteId: {
     type: objectid,
-    ref:"site"
+    ref: "site"
   },
   siteName: {
     type: String,
@@ -24,22 +24,16 @@ const auditSchema = mongoose.Schema({
   address: {
     type: String,
   },
-  // auditRequirements: [
-  //   {
-  //     type: String,
-  //   },
-  // ],
-  Status:{
-    type:String,
-   // enum:["pending","ongoing","completed"],
-    default:"pending"
+  Status: {
+    type: String,
+    default: "pending"
   },
-  // uploadFileFromYourDevice: {
-  //   type: String,
-  // },
-  checksheetid:{
-    type:objectid,
-    ref:"checkSheet"
+  comment: {
+    type: String,
+  },
+  checksheetid: {
+    type: objectid,
+    ref: "checkSheet"
   }
 });
 
