@@ -187,7 +187,7 @@ exports.assignSite = async (req, res) => {
           let checkSheetQuestion = [];
           for (let j = 0; j < checkSheet1.CheckSheetQuestionId.length; j++) {
             let obj1 = {
-              siteId: site.clientId,
+              siteId: site._id,
               checkSheetId: checkSheet1._id,
               checkSheetQuestionId: checkSheet1.CheckSheetQuestionId[i],
             }
