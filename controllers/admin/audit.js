@@ -62,7 +62,7 @@ exports.getAllAudits = async (req, res) => {
 };
 exports.getAuditById = async (req, res) => {
   try {
-    const audit = await Audit.findById(req.params.id).populate("siteId checksheetid")
+    const audit = await Audit.findById(req.params.id).populate([{ path: "siteId" }, { path: "checksheetid", populate: { path: "CheckSheetQuestionId" } }]);
     res.status(200).json({ success: true, data: audit });
   } catch (error) {
     res.status(404).json({ success: false, error: "Audit not found" });
