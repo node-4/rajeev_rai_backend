@@ -23,5 +23,7 @@ router.delete("/admin/delete/deleteSite/:id", siteController.deleteSite);
 router.post("/admin/uploadSite", upload1.single("file"), siteController.importSite);
 router.get("/admin/downloadSite", siteController.downloadSite);
 router.get("/admin/getAll/getAllSitesForAuditorOrReviewer", siteController.getAllSitesForAuditorOrReviewer);
-
+router.put("/admin/updateScheduleSite/:id", siteController.updateScheduleSite);
+router.get("/admin/getScheduleSiteById/:id", siteController.getScheduleSiteById);
+router.delete("/admin/deleteScheduleSite/:id", siteController.deleteScheduleSite);
 module.exports = router;

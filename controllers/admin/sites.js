@@ -262,3 +262,91 @@ exports.getAllClientNames = async (req, res) => {
     return res.status(500).json({ error: "Failed to get client names" });
   }
 };
+exports.updateScheduleSite = async (req, res) => {
+  try {
+    const findsReportSite = await reportSites.findById(req.params.id);
+    if (!findsReportSite) {
+      return res.status(404).json({ message: "Cannot find site" });
+    } else {
+      const site = await Site.findById({ _id: findsReportSite.siteId });
+      if (!site) {
+        return res.status(404).json({ message: "Cannot find site" });
+      } else {
+        let reportSite = [];
+        for (let i = 0; i < req.body.checkSheetId.length; i++) {
+          let checkSheet1 = await CheckSheet.findById(req.body.checkSheetId[i]);
+          if (checkSheet1) {
+            let checkSheetQuestion = [];
+            for (let j = 0; j < checkSheet1.CheckSheetQuestionId.length; j++) {
+              let obj1 = {
+                siteId: findsReportSite.siteId,
+                checkSheetId: checkSheet1._id,
+                checkSheetQuestionId: checkSheet1.CheckSheetQuestionId[i],
+              }
+              const landData1 = await reportCheckSheetQuestion.create(obj1);
+              let obj = {
+                reportCheckSheetQuestionId: landData1._id,
+              }
+              checkSheetQuestion.push(obj);
+            }
+            let reportSitesObj = {
+              clientId: site.clientId,
+              auditorId: req.body.auditorId,
+              reviewerId: req.body.reviewerId,
+              siteId: site._id,
+              dateAllocated: req.body.dateAllocated,
+              dateAuditScheduled: req.body.dateAuditScheduled,
+              checksheet: req.body.checkSheetId[i],
+              checkSheetQuestion: checkSheetQuestion,
+            }
+            const landData = await reportSites.findByIdAndUpdate({ _id: findsReportSite._id }, { $set: reportSitesObj }, { new: true });
+            if (landData) {
+              reportSite.push(landData._id)
+              for (let k = 0; k < landData.checkSheetQuestion.length; k++) {
+                const landData1 = await reportCheckSheetQuestion.findById({ _id: landData.checkSheetQuestion[k].reportCheckSheetQuestionId });
+                await reportCheckSheetQuestion.findByIdAndUpdate({ _id: landData1._id }, { $set: { reportSitesId: landData._id } }, { new: true });
+              }
+            }
+          }
+        }
+        const site1 = await Site.findByIdAndUpdate({ _id: site._id }, { $set: { reportSites: reportSite } }, { new: true });
+        return res.json({ status: 200, message: "Check sheet assigned successfully.", site1 });
+      }
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+exports.getScheduleSiteById = async (req, res) => {
+  try {
+    const findsReportSite = await reportSites.findById(req.params.id);
+    if (!findsReportSite) {
+      return res.status(404).json({ message: "Cannot find ScheduleSite" });
+    } else {
+      return res.json({ status: 200, message: "ScheduleSite found successfully.", site1 });
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+exports.deleteScheduleSite = async (req, res) => {
+  try {
+    const findsReportSite = await reportSites.findById(req.params.id);
+    if (!findsReportSite) {
+      return res.status(404).json({ message: "Cannot find ScheduleSite" });
+    } else {
+      const landData = await reportSites.findByIdAndDelete({ _id: findsReportSite._id });
+      if (landData) {
+        const landData1 = await reportCheckSheetQuestion.find({ reportSitesId: req.params.id });
+        if (landData1.length > 0) {
+          for (let i = 0; i < landData1.length; i++) {
+            await reportCheckSheetQuestion.findByIdAndDelete({ _id: landData1[i]._id });
+          }
+        }
+      }
+      return res.json({ status: 200, message: "ScheduleSite delete successfully.", site1 });
+    }
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
