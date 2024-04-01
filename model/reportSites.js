@@ -17,6 +17,12 @@ const siteSchema = mongoose.Schema({
     type: objectid,
     ref: "site"
   },
+  contractorTSPName: {
+    type: String,
+  },
+  contractorTSPMobileNo: {
+    type: String,
+  },
   dateAllocated: {
     type: Date,
   },

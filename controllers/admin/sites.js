@@ -204,6 +204,9 @@ exports.assignSite = async (req, res) => {
             siteId: site._id,
             dateAllocated: req.body.dateAllocated,
             dateAuditScheduled: req.body.dateAuditScheduled,
+            dateActualAudit: req.body.dateActualAudit,
+            contractorTSPName: req.body.contractorTSPName,
+            contractorTSPMobileNo: req.body.contractorTSPMobileNo,
             checksheet: req.body.checkSheetId[i],
             checkSheetQuestion: checkSheetQuestion,
           }
@@ -295,7 +298,10 @@ exports.updateScheduleSite = async (req, res) => {
               reviewerId: req.body.reviewerId,
               siteId: site._id,
               dateAllocated: req.body.dateAllocated,
+              dateActualAudit: req.body.dateActualAudit,
               dateAuditScheduled: req.body.dateAuditScheduled,
+              contractorTSPName: req.body.contractorTSPName,
+              contractorTSPMobileNo: req.body.contractorTSPMobileNo,
               checksheet: req.body.checkSheetId[i],
               checkSheetQuestion: checkSheetQuestion,
             }
@@ -344,7 +350,7 @@ exports.deleteScheduleSite = async (req, res) => {
           }
         }
       }
-      return res.json({ status: 200, message: "ScheduleSite delete successfully.", site1 });
+      return res.json({ status: 200, message: "ScheduleSite delete successfully.", landData });
     }
   } catch (err) {
     return res.status(400).json({ message: err.message });
