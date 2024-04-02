@@ -329,7 +329,7 @@ exports.getScheduleSiteById = async (req, res) => {
     if (!findsReportSite) {
       return res.status(404).json({ message: "Cannot find ScheduleSite" });
     } else {
-      return res.json({ status: 200, message: "ScheduleSite found successfully.", site1 });
+      return res.json({ status: 200, message: "ScheduleSite found successfully.", findsReportSite });
     }
   } catch (err) {
     return res.status(400).json({ message: err.message });
