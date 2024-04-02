@@ -325,7 +325,7 @@ exports.updateScheduleSite = async (req, res) => {
 };
 exports.getScheduleSiteById = async (req, res) => {
   try {
-    const findsReportSite = await reportSites.findById(req.params.id);
+    const findsReportSite = await reportSites.findById(req.params.id).populate([{ path: "clientId" }, { path: "auditorId" }, { path: "siteId" }, { path: "reviewerId" }, { path: "checksheet" }, { path: "checkSheetQuestion", populate: { path: "reportCheckSheetQuestionId", populate: { path: "checkSheetQuestionId", } } }]);
     if (!findsReportSite) {
       return res.status(404).json({ message: "Cannot find ScheduleSite" });
     } else {
